@@ -1,0 +1,164 @@
+.dashboard {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.metric-card {
+  padding: 24px;
+}
+
+.metric-card h3 {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.metric-value {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.metric-value h2 {
+  font-size: 36px;
+  margin: 0;
+}
+
+.trend {
+  font-size: 14px;
+  font-weight: 600;
+}
+.trend.positive { color: var(--success); }
+.trend.negative { color: var(--danger); }
+
+.chart-section {
+  padding: 24px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header h3 {
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.mock-chart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.bar-wrapper {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px 4px 0 0;
+}
+
+.bar {
+  width: 100%;
+  background: var(--accent-gradient);
+  border-radius: 4px 4px 0 0;
+  transition: height 1s ease-out;
+}
+
+.bar:hover {
+  filter: brightness(1.2);
+}
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.models-section, .providers-section {
+  padding: 24px;
+}
+
+.models-section h3, .providers-section h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.model-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.model-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-md);
+}
+
+.model-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.provider-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.provider-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.provider-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  border-radius: 4px;
+}
