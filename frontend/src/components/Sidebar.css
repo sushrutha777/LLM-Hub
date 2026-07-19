@@ -8,34 +8,68 @@
   flex-direction: column;
   padding: 24px 16px;
   border-radius: var(--radius-lg);
+  z-index: 100;
+  overflow-y: auto;
 }
 
 .sidebar-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   padding: 0 12px;
 }
 
 .sidebar-header h2 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
+.sidebar-subtitle {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Nav sections */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  flex: 1;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.nav-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px 16px 6px;
+  display: block;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
+  gap: 14px;
+  padding: 11px 16px;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
+  font-size: 14px;
   transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .nav-item:hover {
@@ -44,11 +78,37 @@
 }
 
 .nav-item.active {
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(37, 99, 235, 0.12);
   color: var(--text-primary);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(37, 99, 235, 0.25);
 }
 
 .nav-icon {
-  font-size: 20px;
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+
+/* Footer */
+.sidebar-footer {
+  padding: 16px 12px 4px;
+  border-top: 1px solid var(--border-light);
+  margin-top: auto;
+}
+
+.version-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.version-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
 }

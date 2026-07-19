@@ -11,7 +11,8 @@ redis==5.0.6
 PyJWT==2.8.0
 bcrypt==4.1.3
 python-multipart==0.0.9
-redis==5.0.6
-httpx==0.27.0
+python-dotenv==1.0.1
 pytest==8.2.2
 prometheus-fastapi-instrumentator==7.0.0
+# Amazon Bedrock (AWS SDK)
+boto3>=1.34.0

@@ -9,23 +9,42 @@ from model_router.providers.openai_provider import OpenAIProvider
 from model_router.providers.gemini_provider import GeminiProvider
 from model_router.providers.groq_provider import GroqProvider
 from model_router.providers.cohere_provider import CohereProvider
+from model_router.providers.anthropic_provider import AnthropicProvider
+from model_router.providers.azure_provider import AzureProvider
+from model_router.providers.mistral_provider import MistralProvider
+from model_router.providers.bedrock_provider import BedrockProvider
+from model_router.providers.together_provider import TogetherProvider
 from shared.config.settings import settings
 
 router = APIRouter()
 redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
+
 def get_provider(model_name: str):
+    """Route model names to the correct provider adapter.
+    Gemini is the default/base provider when no other prefix matches."""
     if model_name.startswith("gpt"):
         return OpenAIProvider()
-    elif model_name.startswith("gemini"):
-        return GeminiProvider()
+    elif model_name.startswith("claude"):
+        return AnthropicProvider()
+    elif model_name.startswith("mistral"):
+        return MistralProvider()
     elif model_name.startswith("command"):
         return CohereProvider()
+    elif model_name.startswith("azure"):
+        return AzureProvider()
+    elif model_name.startswith("bedrock"):
+        return BedrockProvider()
+    elif model_name.startswith("together"):
+        return TogetherProvider()
     elif model_name in ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma-7b-it"]:
         return GroqProvider()
-    else:
-        # Fallback to local models via Ollama
+    elif model_name.startswith("ollama"):
         return OllamaProvider()
+    else:
+        # Default / base provider is Gemini
+        return GeminiProvider()
+
 
 def generate_cache_key(body: ChatCompletionRequest) -> str:
     # Hash the model, messages, and temp to form a unique cache key

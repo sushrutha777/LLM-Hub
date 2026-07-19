@@ -14,6 +14,28 @@ LLMHub is a robust, microservices-based API Gateway and Model Router that standa
 
 ## 🏗️ Architecture
 
+```text
+                    Applications
+                         │
+                         ▼
+                 ┌─────────────────┐
+                 │     LLMHub      │
+                 ├─────────────────┤
+                 │ Authentication  │
+                 │ API Keys        │
+                 │ Rate Limiting   │
+                 │ Request Logging │
+                 │ Analytics       │
+                 │ Caching         │
+                 │ Model Routing   │
+                 │ Health Checks   │
+                 └─────────────────┘
+                                         │
+   ┌───────┬────────┬───────┬────────┬───┴───┬───────┬────────┬───────┬────────┐
+   ▼       ▼        ▼       ▼        ▼       ▼       ▼        ▼       ▼        ▼
+ OpenAI  Gemini   Claude  Mistral  Cohere   Groq   Ollama   Azure  Bedrock  Together
+```
+
 LLMHub is organized into several specialized microservices and foundational layers:
 
 * **`backend/gateway/`** - The primary entry point. Validates API keys and routes incoming requests.

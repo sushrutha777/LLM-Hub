@@ -2,17 +2,32 @@
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
-const navItems = [
-  { icon: '🏠', label: 'Dashboard', path: '/dashboard' },
-  { icon: '💬', label: 'Playground', path: '/playground' },
-  { icon: '⚖️', label: 'Compare Models', path: '/compare' },
-  { icon: '📦', label: 'Models', path: '/models' },
-  { icon: '📈', label: 'Analytics', path: '/analytics' },
-  { icon: '📜', label: 'Logs', path: '/logs' },
-  { icon: '❤️', label: 'Health', path: '/health' },
-  { icon: '🔑', label: 'API Keys', path: '/keys' },
-  { icon: '⚙️', label: 'Settings', path: '/settings' },
-  { icon: '👤', label: 'Profile', path: '/profile' },
+const navSections = [
+  {
+    label: 'MAIN',
+    items: [
+      { icon: '🏠', label: 'Dashboard', path: '/dashboard' },
+      { icon: '💬', label: 'Playground', path: '/playground' },
+      { icon: '⚖️', label: 'Compare Models', path: '/compare' },
+    ],
+  },
+  {
+    label: 'MANAGEMENT',
+    items: [
+      { icon: '📦', label: 'Models', path: '/models' },
+      { icon: '🔌', label: 'Providers', path: '/providers' },
+      { icon: '🔑', label: 'API Keys', path: '/keys' },
+    ],
+  },
+  {
+    label: 'SYSTEM',
+    items: [
+      { icon: '📈', label: 'Analytics', path: '/analytics' },
+      { icon: '📜', label: 'Logs', path: '/logs' },
+      { icon: '❤️', label: 'Health', path: '/health' },
+      { icon: '⚙️', label: 'Settings', path: '/settings' },
+    ],
+  },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -20,19 +35,31 @@ export const Sidebar: React.FC = () => {
     <aside className="sidebar glass-panel">
       <div className="sidebar-header">
         <h2 className="text-gradient">LLMHub</h2>
+        <span className="sidebar-subtitle">Admin Console</span>
       </div>
       <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.label}
-            to={item.path}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span className="nav-label">{item.label}</span>
-          </NavLink>
+        {navSections.map((section) => (
+          <div key={section.label} className="nav-section">
+            <span className="nav-section-label">{section.label}</span>
+            {section.items.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.path}
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
+      <div className="sidebar-footer">
+        <div className="version-badge">
+          <span className="version-dot"></span>
+          LLMHub v1.0
+        </div>
+      </div>
     </aside>
   );
 };
