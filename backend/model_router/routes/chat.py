@@ -64,6 +64,37 @@ async def create_chat_completion(
     user_id = request.headers.get("X-User-ID")
     api_key_id = request.headers.get("X-API-Key-ID")
     
+    # Keep track of original requested model name
+    original_model = body.model
+    
+    # 0. Resolve AI Profile logical name if applicable
+    model_name = body.model
+    cache_key_profile = f"profile:{model_name}"
+    resolved_model = None
+    try:
+        resolved_model = await redis_client.get(cache_key_profile)
+    except Exception:
+        pass
+
+    if not resolved_model:
+        # Check SQLite DB for active profile
+        from shared.database.session import SessionLocal
+        from shared.database.models import AIProfile
+        db = SessionLocal()
+        try:
+            profile = db.query(AIProfile).filter(AIProfile.id == model_name, AIProfile.is_active == True).first()
+            if profile:
+                resolved_model = profile.model_id
+                try:
+                    await redis_client.setex(cache_key_profile, 3600, resolved_model)
+                except Exception:
+                    pass
+        finally:
+            db.close()
+
+    if resolved_model:
+        body.model = resolved_model
+        
     cache_key = generate_cache_key(body)
     
     # 1. Check Redis Cache for exact semantic match (Non-streaming only for phase 2)
@@ -76,6 +107,7 @@ async def create_chat_completion(
                 # Inject a meta flag indicating it was cached
                 parsed = json.loads(cached_result)
                 parsed["cached"] = True 
+                parsed["model"] = original_model # Make sure cached responses also report original model
                 return JSONResponse(content=parsed)
         except Exception as e:
             import logging
@@ -92,6 +124,9 @@ async def create_chat_completion(
         )
     else:
         response = await provider.generate(body)
+        
+        # Restore the original model name in the response
+        response.model = original_model
         
         # Cache the result in Redis for 1 hour (3600 seconds)
         try:

@@ -16,6 +16,7 @@ const navSections = [
     items: [
       { icon: '📦', label: 'Models', path: '/models' },
       { icon: '🔌', label: 'Providers', path: '/providers' },
+      { icon: '🤖', label: 'AI Profiles', path: '/profiles' },
       { icon: '🔑', label: 'API Keys', path: '/keys' },
     ],
   },

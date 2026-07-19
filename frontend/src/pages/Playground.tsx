@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { chatApi } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { chatApi, profilesApi } from '../services/api';
 import './Playground.css';
 
 interface Message {
@@ -13,6 +13,23 @@ export const Playground: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profiles, setProfiles] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const data = await profilesApi.getProfiles();
+        const active = data.filter((p: any) => p.is_active);
+        setProfiles(active);
+        if (active.length > 0) {
+          setModel(active[0].id);
+        }
+      } catch (e) {
+        console.warn("Failed to load AI Profiles in playground:", e);
+      }
+    };
+    fetchProfiles();
+  }, []);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +80,13 @@ export const Playground: React.FC = () => {
           <div className="form-group">
             <label>Model</label>
             <select value={model} onChange={e => setModel(e.target.value)}>
+              {profiles.length > 0 && (
+                <optgroup label="AI Profiles (Logical Models)">
+                  {profiles.map(p => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.id})</option>
+                  ))}
+                </optgroup>
+              )}
               <optgroup label="Google (Gemini)">
                 <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                 <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>

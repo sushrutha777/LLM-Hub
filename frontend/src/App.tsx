@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Sidebar } from './components/Sidebar'
 import { Dashboard } from './components/Dashboard'
 import { ApiKeys } from './pages/ApiKeys'
+import { AiProfiles } from './pages/AiProfiles'
 import { Playground } from './pages/Playground'
 import { Models } from './pages/Models'
 import { Providers } from './pages/Providers'
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/keys" element={<ApiKeys />} />
+            <Route path="/profiles" element={<AiProfiles />} />
             <Route path="/playground" element={<Playground />} />
             <Route path="/models" element={<Models />} />
             <Route path="/providers" element={<Providers />} />
