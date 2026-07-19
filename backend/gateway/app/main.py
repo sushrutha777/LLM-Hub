@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from shared.config.settings import settings
+from core.logging import RequestLoggingMiddleware
 from routes import proxy
 
 app = FastAPI(
@@ -15,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(RequestLoggingMiddleware)
 
 @app.get("/health")
 def health_check():
