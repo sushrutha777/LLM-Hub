@@ -4,7 +4,7 @@ import httpx
 from typing import AsyncGenerator
 from fastapi import HTTPException
 from .base_provider import BaseProvider
-from schemas.openai import ChatCompletionRequest, ChatCompletionResponse
+from model_router.schemas.openai import ChatCompletionRequest, ChatCompletionResponse
 
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 

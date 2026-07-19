@@ -3,7 +3,7 @@ from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy.orm import Session
 from shared.database.session import SessionLocal
 from shared.database.models import APIKey
-from core.rate_limit import check_rate_limit
+from gateway.core.rate_limit import check_rate_limit
 
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 

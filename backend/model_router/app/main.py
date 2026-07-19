@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from shared.config.settings import settings
-from routes import chat
+from model_router.routes import chat
 
 app = FastAPI(
     title=f"{settings.PROJECT_NAME} - Model Router",

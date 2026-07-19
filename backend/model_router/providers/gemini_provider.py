@@ -6,7 +6,7 @@ import httpx
 from typing import AsyncGenerator
 from fastapi import HTTPException
 from .base_provider import BaseProvider
-from schemas.openai import ChatCompletionRequest, ChatCompletionResponse, ChatMessage, Choice, Usage
+from model_router.schemas.openai import ChatCompletionRequest, ChatCompletionResponse, ChatMessage, Choice, Usage
 
 class GeminiProvider(BaseProvider):
     

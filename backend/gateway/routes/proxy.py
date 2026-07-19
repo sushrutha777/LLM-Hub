@@ -1,7 +1,7 @@
 import httpx
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
-from core.auth import get_api_key
+from gateway.core.auth import get_api_key
 from shared.database.models import APIKey
 
 router = APIRouter()

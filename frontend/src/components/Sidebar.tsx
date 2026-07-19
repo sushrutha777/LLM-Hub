@@ -1,17 +1,18 @@
-import React from 'react';
+
+import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
 const navItems = [
-  { icon: '🏠', label: 'Dashboard', active: true },
-  { icon: '💬', label: 'Playground' },
-  { icon: '⚖️', label: 'Compare Models' },
-  { icon: '📦', label: 'Models' },
-  { icon: '📈', label: 'Analytics' },
-  { icon: '📜', label: 'Logs' },
-  { icon: '❤️', label: 'Health' },
-  { icon: '🔑', label: 'API Keys' },
-  { icon: '⚙️', label: 'Settings' },
-  { icon: '👤', label: 'Profile' },
+  { icon: '🏠', label: 'Dashboard', path: '/dashboard' },
+  { icon: '💬', label: 'Playground', path: '/playground' },
+  { icon: '⚖️', label: 'Compare Models', path: '/compare' },
+  { icon: '📦', label: 'Models', path: '/models' },
+  { icon: '📈', label: 'Analytics', path: '/analytics' },
+  { icon: '📜', label: 'Logs', path: '/logs' },
+  { icon: '❤️', label: 'Health', path: '/health' },
+  { icon: '🔑', label: 'API Keys', path: '/keys' },
+  { icon: '⚙️', label: 'Settings', path: '/settings' },
+  { icon: '👤', label: 'Profile', path: '/profile' },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -22,14 +23,14 @@ export const Sidebar: React.FC = () => {
       </div>
       <nav className="sidebar-nav">
         {navItems.map((item) => (
-          <a
+          <NavLink
             key={item.label}
-            href="#"
-            className={`nav-item ${item.active ? 'active' : ''}`}
+            to={item.path}
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>
-          </a>
+          </NavLink>
         ))}
       </nav>
     </aside>

@@ -5,7 +5,7 @@ import httpx
 from typing import AsyncGenerator
 from fastapi import HTTPException
 from .base_provider import BaseProvider
-from schemas.openai import ChatCompletionRequest, ChatCompletionResponse, ChatMessage, Choice, Usage
+from model_router.schemas.openai import ChatCompletionRequest, ChatCompletionResponse, ChatMessage, Choice, Usage
 
 # In a real setup, this would be injected via settings
 OLLAMA_API_URL = "http://127.0.0.1:11434"

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator
-from schemas.openai import ChatCompletionRequest, ChatCompletionResponse
+from model_router.schemas.openai import ChatCompletionRequest, ChatCompletionResponse
 
 class BaseProvider(ABC):
     

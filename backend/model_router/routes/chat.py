@@ -3,10 +3,10 @@ import json
 import redis.asyncio as redis
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse, JSONResponse
-from schemas.openai import ChatCompletionRequest, ChatCompletionResponse
-from providers.ollama_provider import OllamaProvider
-from providers.openai_provider import OpenAIProvider
-from providers.gemini_provider import GeminiProvider
+from model_router.schemas.openai import ChatCompletionRequest, ChatCompletionResponse
+from model_router.providers.ollama_provider import OllamaProvider
+from model_router.providers.openai_provider import OpenAIProvider
+from model_router.providers.gemini_provider import GeminiProvider
 from shared.config.settings import settings
 
 router = APIRouter()
