@@ -2,8 +2,44 @@
 
 > A production-grade, enterprise AI platform to deploy, manage, serve, route, monitor, and scale multiple Large Language Models.
 
+## ❓ The Problem
 
-LLMHub is a robust, microservices-based API Gateway and Model Router that standardizes how internal applications interact with Large Language Models. Instead of applications calling OpenAI, Anthropic, or local models directly, they communicate with LLMHub, which handles authentication, routing, caching, and rate limiting.
+Modern applications integrate directly with various LLM providers like OpenAI, Gemini, Claude, or local Ollama instances. As organizations adopt multiple AI providers, this creates:
+
+*   **Duplicated Integrations:** Every application team implements custom client wrappers, retry logic, and error handling.
+*   **Scattered API Keys:** Secrets are distributed across numerous environments and codebases, increasing security risks.
+*   **Poor Monitoring:** Lack of centralized observability, logging, cost tracking, and request auditing.
+*   **High Operational Costs:** No centralized caching (leading to redundant queries) or failover mechanism to fallback to cheaper providers/models.
+
+## 💡 The Solution: Centralized AI Gateway
+
+**LLMHub** solves these challenges by introducing a centralized, production-grade AI Gateway. 
+
+Instead of applications calling providers directly, they communicate with LLMHub via a standardized API. LLMHub handles authentication, routing, caching, rate limiting, and analytics in a robust, microservices-based control plane.
+
+```text
+  Before LLMHub (Direct Integration Chaos)        After LLMHub (Centralized AI Gateway)
+
+   ┌─────────┐       ┌─────────┐                   ┌─────────┐
+   │  App A  ├──────>│ OpenAI  │                   │  App A  ├───┐
+   └─────────┘       └─────────┘                   └─────────┘   │   ┌──────────────┐      ┌─────────┐
+   ┌─────────┐       ┌─────────┐                   ┌─────────┐   ├──>│    LLMHub    ├─────>│ OpenAI  │
+   │  App B  ├──────>│ Gemini  │                   │  App B  ├───┤   │  (AI Gateway)│      ├─────────┤
+   └─────────┘       └─────────┘                   └─────────┘   │   └──────────────┘      │ Gemini  │
+   ┌─────────┐       ┌─────────┐                   ┌─────────┐   │                         ├─────────┤
+   │  App C  ├──────>│ Ollama  │                   │  App C  ├───┘                         │ Ollama  │
+   └─────────┘       └─────────┘                   └─────────┘                             └─────────┘
+```
+
+## 🆚 Why not call OpenAI directly?
+
+| Without LLMHub | With LLMHub |
+| :--- | :--- |
+| Every app stores provider API keys | Only LLMHub stores provider API keys |
+| Provider-specific integrations | Single unified API |
+| Switching providers requires app changes | Change routing rules only |
+| No centralized analytics | Unified logging and dashboards |
+| Separate rate limiting | Centralized rate limiting |
 
 ## 🌟 Features
 
@@ -45,6 +81,105 @@ LLMHub is organized into several specialized microservices and foundational laye
 * **`backend/shared/`** - The shared Python core containing database models and security utilities.
 * **`frontend/`** - A sleek React application for managing keys, monitoring usage, and testing prompts.
 
+## 🔌 API Example
+
+LLMHub exposes a centralized AI Gateway endpoint. Application developers only need to point their client to the Gateway.
+
+### Request
+
+```http
+POST /api/v1/chat
+Authorization: Bearer llmhub_sk_xxxxx
+Content-Type: application/json
+
+{
+  "profile": "invoice-extractor",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Extract invoice details."
+    }
+  ]
+}
+```
+
+### Response
+
+```json
+{
+  "provider": "Gemini",
+  "model": "gemini-2.5-flash",
+  "latency": 420,
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Here are the extracted details from the invoice..."
+      },
+      "finish_reason": "stop"
+    }
+  ]
+}
+```
+
+## 📦 Client SDKs
+
+We provide lightweight SDKs for seamless client-side integration.
+
+### Python SDK
+
+#### Installation
+```bash
+pip install ./sdk/python
+```
+
+#### Usage
+```python
+from llmhub import Client
+
+client = Client(api_key="llmhub_sk_xxxxx", base_url="http://localhost:8000")
+
+response = client.chat(
+    profile="rag-chat",
+    messages=[
+        {"role": "user", "content": "How does LLMHub route models?"}
+    ]
+)
+
+print(response["choices"][0]["message"]["content"])
+```
+
+### JavaScript SDK
+
+#### Installation
+```bash
+npm install ./sdk/javascript
+```
+
+#### Usage
+```javascript
+const { Client } = require('llmhub-sdk');
+
+const client = new Client({
+  apiKey: 'llmhub_sk_xxxxx',
+  baseUrl: 'http://localhost:8000'
+});
+
+async function run() {
+  const response = await client.chat({
+    profile: 'rag-chat',
+    messages: [
+      { role: 'user', content: 'Explain LLMHub routing.' }
+    ]
+  });
+
+  console.log(response.choices[0].message.content);
+}
+
+run();
+```
+
 ## 🚀 Quick Start (Development)
 
 LLMHub uses a Docker-first approach for easy local development.
@@ -69,9 +204,26 @@ LLMHub uses a Docker-first approach for easy local development.
 
 ## 🗺️ Roadmap
 
-- [x] Scaffold Microservices Architecture
-- [ ] Phase 1: Authentication & Basic Routing
-- [ ] Phase 2: Multi-Model Support & Redis Caching
-- [ ] Phase 3: Admin Control Plane & Monitoring
-- [ ] Phase 4: Kubernetes Deployment Manifests
-- [ ] Phase 5: Enterprise RBAC & Multi-Tenant Support
+- ✅ **Authentication** - JWT-based auth and service token validations.
+- ✅ **API Keys** - Generate and manage client keys.
+- ✅ **Gateway** - Async reverse proxy routing layer.
+- ✅ **Provider Routing** - Automatic adapters for OpenAI, Claude, Gemini, etc.
+- 🚧 **Analytics** - Centralized prompt/response logging and usage graphs.
+- 🚧 **Cost Tracking** - Dynamic tracking of tokens and provider bills.
+- 🚧 **Streaming** - Real-time Server-Sent Events (SSE) token streaming.
+- ⬜ **Kubernetes** - Helm charts and multi-pod auto-scaling configurations.
+- ⬜ **RBAC** - Advanced user role access control.
+- ⬜ **Multi-tenancy** - Isolated environments for different teams/organizations.
+
+## 🔮 Future Features
+
+- **Semantic caching** - Check Redis for semantically identical requests using embeddings to reduce duplicate API costs.
+- **Cost-aware routing** - Dynamically choose the cheapest equivalent model based on load and latency requirements.
+- **Automatic failover** - Gracefully fallback to alternative providers (e.g., Anthropic to OpenAI) when error rates spike.
+- **Prompt templates** - Version-control prompts directly on LLMHub and reference them via standard IDs.
+- **Streaming responses** - Native Server-Sent Events (SSE) translation across all providers.
+- **Model benchmarking** - Automatically benchmark response latencies, TTFT (Time To First Token), and throughput.
+- **Multi-region deployment** - Geographically distributed routing to reduce latency.
+- **Team workspaces** - Collaborative prompt playgrounds and key sharing.
+- **Webhooks** - Receive real-time alerts for errors, anomalies, and quota limits.
+- **Usage quotas** - Enforce soft/hard limits on usage/cost for specific API Keys and teams.

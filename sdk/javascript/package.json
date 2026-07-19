@@ -1,0 +1,14 @@
+{
+  "name": "llmhub-sdk",
+  "version": "0.1.0",
+  "description": "JavaScript client SDK for the LLMHub AI Gateway",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LLMHub",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
