@@ -1,6 +1,6 @@
 # LLMHub 🚀
 
-> A production-grade, enterprise AI platform to deploy, manage, serve, route, monitor, and scale multiple Large Language Models.
+A production-grade, enterprise AI platform to deploy, manage, serve, route, monitor, and scale multiple Large Language Models.
 
 LLMHub is a robust, microservices-based API Gateway and Model Router that standardizes how internal applications interact with Large Language Models. Instead of applications calling OpenAI, Anthropic, or local models directly, they communicate with LLMHub, which handles authentication, routing, caching, and rate limiting.
 
