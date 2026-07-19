@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Sidebar } from './components/Sidebar'
 import { Dashboard } from './components/Dashboard'
 import { ApiKeys } from './pages/ApiKeys'
+import { Playground } from './pages/Playground'
+import { Models } from './pages/Models'
 import './App.css'
 
 function App() {
@@ -15,6 +17,8 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/keys" element={<ApiKeys />} />
+            <Route path="/playground" element={<Playground />} />
+            <Route path="/models" element={<Models />} />
             <Route path="*" element={<div style={{padding: 32}}><h2>Coming Soon</h2><p className="text-muted">This feature is under development.</p></div>} />
           </Routes>
         </div>

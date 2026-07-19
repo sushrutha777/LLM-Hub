@@ -1,8 +1,11 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from shared.config.settings import settings
 from gateway.core.logging import RequestLoggingMiddleware
-from gateway.routes import proxy, admin
+from gateway.routes import proxy, admin, models
 
 app = FastAPI(
     title=f"{settings.PROJECT_NAME} - API Gateway",
@@ -24,4 +27,5 @@ def health_check():
     return {"status": "gateway healthy"}
 
 app.include_router(admin.router, prefix="/v1/admin", tags=["admin"])
+app.include_router(models.router, prefix="/v1/models", tags=["models"])
 app.include_router(proxy.router, tags=["proxy"])

@@ -7,6 +7,8 @@ from model_router.schemas.openai import ChatCompletionRequest, ChatCompletionRes
 from model_router.providers.ollama_provider import OllamaProvider
 from model_router.providers.openai_provider import OpenAIProvider
 from model_router.providers.gemini_provider import GeminiProvider
+from model_router.providers.groq_provider import GroqProvider
+from model_router.providers.cohere_provider import CohereProvider
 from shared.config.settings import settings
 
 router = APIRouter()
@@ -17,6 +19,10 @@ def get_provider(model_name: str):
         return OpenAIProvider()
     elif model_name.startswith("gemini"):
         return GeminiProvider()
+    elif model_name.startswith("command"):
+        return CohereProvider()
+    elif model_name in ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma-7b-it"]:
+        return GroqProvider()
     else:
         # Fallback to local models via Ollama
         return OllamaProvider()
