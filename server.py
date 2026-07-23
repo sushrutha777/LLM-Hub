@@ -1,11 +1,13 @@
 import os
+import sys
 import subprocess
 import httpx
-from fastapi import FastAPI, Request, Header, HTTPException
+from fastapi import FastAPI, Request, Header, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+import websockets
 from gateway import process_request
 
 app = FastAPI(title="LLMHub AI Gateway")
@@ -18,11 +20,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Start Streamlit process on startup
+# Start Streamlit process using sys.executable on startup
 @app.on_event("startup")
 def start_streamlit():
     subprocess.Popen([
-        "streamlit", "run", "app.py",
+        sys.executable, "-m", "streamlit", "run", "app.py",
         "--server.port=8501",
         "--server.address=127.0.0.1",
         "--server.headless=true",
@@ -55,7 +57,33 @@ async def chat_completions(req: ChatRequest, authorization: str = Header(None)):
 async def health_check():
     return {"status": "ok", "service": "LLMHub AI Gateway"}
 
-# Proxy all UI requests to Streamlit on 8501
+# WebSocket proxy for Streamlit interactive updates
+@app.websocket("/_stcore/stream")
+async def websocket_proxy(ws: WebSocket):
+    await ws.accept()
+    async with websockets.connect("ws://127.0.0.1:8501/_stcore/stream") as target_ws:
+        async def forward_to_target():
+            try:
+                while True:
+                    data = await ws.receive_bytes()
+                    await target_ws.send(data)
+            except Exception:
+                pass
+
+        async def forward_to_client():
+            try:
+                while True:
+                    data = await target_ws.recv()
+                    if isinstance(data, str):
+                        await ws.send_text(data)
+                    else:
+                        await ws.send_bytes(data)
+            except Exception:
+                pass
+
+        await asyncio.gather(forward_to_target(), forward_to_client(), return_exceptions=True)
+
+# Proxy HTTP UI requests to Streamlit on 8501
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"])
 async def proxy_to_streamlit(request: Request, path: str):
     async with httpx.AsyncClient(base_url="http://127.0.0.1:8501") as client:

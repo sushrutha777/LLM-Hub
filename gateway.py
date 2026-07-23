@@ -12,6 +12,7 @@ DB_PATH = "gateway.db"
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL;")
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS request_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,7 +31,7 @@ init_db()
 
 def log_request(provider: str, model: str, latency_ms: int, status: str, key_snippet: str):
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO request_logs (timestamp, provider, model, latency_ms, status, key_snippet)
@@ -43,7 +44,7 @@ def log_request(provider: str, model: str, latency_ms: int, status: str, key_sni
 
 def get_recent_logs(limit: int = 50) -> List[Dict]:
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
         cursor = conn.cursor()
         cursor.execute("""
             SELECT timestamp, provider, model, latency_ms, status, key_snippet
