@@ -112,23 +112,6 @@ async def route_to_groq(model: str, messages: List[Dict], temperature: float = 0
         except Exception as e:
             return {"error": f"Groq request failed: {str(e)}"}
 
-async def route_to_grok(model: str, messages: List[Dict], temperature: float = 0.7) -> Dict:
-    api_key = os.getenv("XAI_API_KEY", "")
-    if not api_key:
-        return {"error": "XAI_API_KEY environment variable is not set."}
-
-    async with httpx.AsyncClient() as client:
-        try:
-            resp = await client.post(
-                "https://api.x.ai/v1/chat/completions",
-                headers={"Authorization": f"Bearer {api_key}"},
-                json={"model": model, "messages": messages, "temperature": temperature},
-                timeout=30.0
-            )
-            return resp.json()
-        except Exception as e:
-            return {"error": f"xAI Grok request failed: {str(e)}"}
-
 async def process_request(model: str, messages: List[Dict], temperature: float = 0.7, api_key: str = "") -> Dict:
     start_time = time.time()
     
@@ -139,9 +122,6 @@ async def process_request(model: str, messages: List[Dict], temperature: float =
     elif "gemini" in model_lower:
         provider = "Gemini"
         response = await route_to_gemini(model, messages, temperature)
-    elif "grok" in model_lower:
-        provider = "xAI (Grok)"
-        response = await route_to_grok(model, messages, temperature)
     elif "llama" in model_lower or "mixtral" in model_lower or "groq" in model_lower:
         provider = "Groq"
         response = await route_to_groq(model, messages, temperature)
