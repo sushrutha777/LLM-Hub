@@ -142,3 +142,23 @@ export const chatApi = {
     return data.choices[0].message.content;
   }
 };
+
+export const analyticsApi = {
+  getMetrics: async (): Promise<any[]> => {
+    const res = await fetch(`${API_BASE}/analytics/metrics`);
+    if (!res.ok) throw new Error("Failed to fetch metrics");
+    return await res.json();
+  },
+  
+  getModels: async (): Promise<any[]> => {
+    const res = await fetch(`${API_BASE}/analytics/models`);
+    if (!res.ok) throw new Error("Failed to fetch models");
+    return await res.json();
+  },
+  
+  getProviders: async (): Promise<any[]> => {
+    const res = await fetch(`${API_BASE}/analytics/providers`);
+    if (!res.ok) throw new Error("Failed to fetch providers");
+    return await res.json();
+  }
+};

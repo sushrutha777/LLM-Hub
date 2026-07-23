@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from shared.config.settings import settings
 from gateway.core.logging import RequestLoggingMiddleware
-from gateway.routes import proxy, admin, models, profiles
+from gateway.routes import proxy, admin, models, profiles, analytics
 
 app = FastAPI(
     title=f"{settings.PROJECT_NAME} - API Gateway",
@@ -14,7 +14,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://localhost:8000", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,6 +27,7 @@ def health_check():
     return {"status": "gateway healthy"}
 
 app.include_router(admin.router, prefix="/v1/admin", tags=["admin"])
+app.include_router(analytics.router, prefix="/v1/admin/analytics", tags=["analytics"])
 app.include_router(profiles.router, prefix="/v1/admin/profiles", tags=["profiles"])
 app.include_router(models.router, prefix="/v1/models", tags=["models"])
 app.include_router(proxy.router, tags=["proxy"])
