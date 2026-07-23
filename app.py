@@ -1,7 +1,7 @@
 import streamlit as st
 import asyncio
 import pandas as pd
-from gateway import process_request, REQUEST_LOGS
+from gateway import process_request, get_recent_logs
 
 st.set_page_config(
     page_title="LLMHub - AI Gateway",
@@ -43,12 +43,14 @@ if page == "📊 Dashboard & Analytics":
     st.markdown('<div class="main-header">LLMHub Control Center</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Centralized monitoring, routing stats, and API metrics.</div>', unsafe_allow_html=True)
 
+    logs = get_recent_logs()
+    
     # Top Metrics Row
     col1, col2, col3, col4 = st.columns(4)
     
-    total_reqs = len(REQUEST_LOGS)
-    avg_latency = int(sum(r["latency_ms"] for r in REQUEST_LOGS) / total_reqs) if total_reqs > 0 else 0
-    success_rate = round((sum(1 for r in REQUEST_LOGS if r["status"] == "Success") / total_reqs) * 100, 1) if total_reqs > 0 else 100.0
+    total_reqs = len(logs)
+    avg_latency = int(sum(r["latency_ms"] for r in logs) / total_reqs) if total_reqs > 0 else 0
+    success_rate = round((sum(1 for r in logs if r["status"] == "Success") / total_reqs) * 100, 1) if total_reqs > 0 else 100.0
 
     col1.metric("Total Gateway Requests", total_reqs)
     col2.metric("Average Latency", f"{avg_latency} ms")
@@ -61,16 +63,16 @@ if page == "📊 Dashboard & Analytics":
 
     with col_left:
         st.subheader("📋 Recent Gateway Logs")
-        if REQUEST_LOGS:
-            df = pd.DataFrame(REQUEST_LOGS)
+        if logs:
+            df = pd.DataFrame(logs)
             st.dataframe(df, use_container_width=True)
         else:
-            st.info("No requests logged yet. Head over to the **AI Playground** to test the router!")
+            st.info("No requests logged yet. Head over to the **AI Playground** or send HTTP API requests to test the router!")
 
     with col_right:
         st.subheader("🌐 Provider Traffic Distribution")
-        if REQUEST_LOGS:
-            df_counts = pd.DataFrame(REQUEST_LOGS)["provider"].value_counts().reset_index()
+        if logs:
+            df_counts = pd.DataFrame(logs)["provider"].value_counts().reset_index()
             df_counts.columns = ["Provider", "Requests"]
             st.bar_chart(df_counts.set_index("Provider"))
         else:

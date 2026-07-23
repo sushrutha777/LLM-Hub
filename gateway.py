@@ -1,13 +1,73 @@
 import os
 import time
+import sqlite3
 import httpx
 from typing import Dict, List, Optional
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Global memory log for requests
-REQUEST_LOGS: List[Dict] = []
+DB_PATH = "gateway.db"
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS request_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT,
+            provider TEXT,
+            model TEXT,
+            latency_ms INTEGER,
+            status TEXT,
+            key_snippet TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db()
+
+def log_request(provider: str, model: str, latency_ms: int, status: str, key_snippet: str):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO request_logs (timestamp, provider, model, latency_ms, status, key_snippet)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (time.strftime("%Y-%m-%d %H:%M:%S"), provider, model, latency_ms, status, key_snippet))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Error writing to DB: {e}")
+
+def get_recent_logs(limit: int = 50) -> List[Dict]:
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT timestamp, provider, model, latency_ms, status, key_snippet
+            FROM request_logs
+            ORDER BY id DESC
+            LIMIT ?
+        """, (limit,))
+        rows = cursor.fetchall()
+        conn.close()
+        
+        return [
+            {
+                "timestamp": r[0],
+                "provider": r[1],
+                "model": r[2],
+                "latency_ms": r[3],
+                "status": r[4],
+                "key_snippet": r[5]
+            }
+            for r in rows
+        ]
+    except Exception as e:
+        print(f"Error reading DB: {e}")
+        return []
 
 async def route_to_openai(model: str, messages: List[Dict], temperature: float = 0.7) -> Dict:
     api_key = os.getenv("OPENAI_API_KEY", "")
@@ -130,15 +190,9 @@ async def process_request(model: str, messages: List[Dict], temperature: float =
         response = await route_to_openai(model, messages, temperature)
 
     latency = int((time.time() - start_time) * 1000)
+    status = "Success" if "error" not in response else "Failed"
+    key_snippet = api_key[-4:] if api_key else "Default"
 
-    log_entry = {
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-        "provider": provider,
-        "model": model,
-        "latency_ms": latency,
-        "status": "Success" if "error" not in response else "Failed",
-        "key_snippet": api_key[-4:] if api_key else "Default"
-    }
-    REQUEST_LOGS.insert(0, log_entry)
+    log_request(provider, model, latency, status, key_snippet)
     
     return response
