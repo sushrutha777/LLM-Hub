@@ -53,7 +53,7 @@ if page == "📊 Dashboard & Analytics":
     col1.metric("Total Gateway Requests", total_reqs)
     col2.metric("Average Latency", f"{avg_latency} ms")
     col3.metric("Success Rate", f"{success_rate}%")
-    col4.metric("Active Providers", "2 (OpenAI, Gemini)")
+    col4.metric("Active Providers", "5 (OpenAI, Gemini, Claude, Groq, Grok)")
 
     st.markdown("---")
 
@@ -86,8 +86,16 @@ elif page == "🧪 AI Playground":
         st.subheader("⚙️ Gateway Configuration")
         model = st.selectbox(
             "Select Target Model",
-            ["gpt-4o", "gpt-3.5-turbo", "gemini-1.5-pro", "gemini-1.5-flash"],
-            help="Models containing 'gemini' route to Google Gemini; others route to OpenAI."
+            [
+                "claude-3-5-sonnet-20240620",
+                "gpt-4o",
+                "gpt-3.5-turbo",
+                "gemini-1.5-pro",
+                "gemini-1.5-flash",
+                "grok-beta",
+                "llama3-70b-8192"
+            ],
+            help="The Gateway automatically inspects the model name and routes to Anthropic, OpenAI, Gemini, Groq, or xAI Grok!"
         )
         temperature = st.slider("Temperature", 0.0, 1.0, 0.7)
         api_key = st.text_input("Gateway API Key", value="llmhub_sk_showcase123", type="password")
@@ -150,7 +158,7 @@ elif page == "🔌 Integration Guide":
             "Content-Type": "application/json"
         },
         json={
-            "model": "gemini-1.5-pro",  # or "gpt-4o"
+            "model": "claude-3-5-sonnet-20240620",  # or "grok-beta", "gemini-1.5-pro", "gpt-4o"
             "messages": [{"role": "user", "content": "Hello from my app!"}]
         }
     )
@@ -164,7 +172,7 @@ elif page == "🔌 Integration Guide":
       -H "Authorization: Bearer llmhub_sk_showcase123" \\
       -H "Content-Type: application/json" \\
       -d '{
-        "model": "gpt-4o",
+        "model": "claude-3-5-sonnet-20240620",
         "messages": [{"role": "user", "content": "Hello!"}]
       }'
     ```

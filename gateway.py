@@ -59,12 +59,92 @@ async def route_to_gemini(model: str, messages: List[Dict], temperature: float =
         except Exception as e:
             return {"error": f"Gemini request failed: {str(e)}"}
 
+async def route_to_claude(model: str, messages: List[Dict], temperature: float = 0.7) -> Dict:
+    api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        return {"error": "ANTHROPIC_API_KEY environment variable is not set."}
+
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json"
+                },
+                json={
+                    "model": model,
+                    "messages": messages,
+                    "max_tokens": 1024,
+                    "temperature": temperature
+                },
+                timeout=30.0
+            )
+            data = resp.json()
+            if "content" in data and len(data["content"]) > 0:
+                text = data["content"][0]["text"]
+                return {
+                    "provider": "Anthropic",
+                    "model": model,
+                    "choices": [{"message": {"role": "assistant", "content": text}}]
+                }
+            elif "error" in data:
+                return {"error": data["error"].get("message", "Anthropic API error")}
+            return data
+        except Exception as e:
+            return {"error": f"Anthropic request failed: {str(e)}"}
+
+async def route_to_groq(model: str, messages: List[Dict], temperature: float = 0.7) -> Dict:
+    api_key = os.getenv("GROQ_API_KEY", "")
+    if not api_key:
+        return {"error": "GROQ_API_KEY environment variable is not set."}
+
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={"model": model, "messages": messages, "temperature": temperature},
+                timeout=30.0
+            )
+            return resp.json()
+        except Exception as e:
+            return {"error": f"Groq request failed: {str(e)}"}
+
+async def route_to_grok(model: str, messages: List[Dict], temperature: float = 0.7) -> Dict:
+    api_key = os.getenv("XAI_API_KEY", "")
+    if not api_key:
+        return {"error": "XAI_API_KEY environment variable is not set."}
+
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.post(
+                "https://api.x.ai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={"model": model, "messages": messages, "temperature": temperature},
+                timeout=30.0
+            )
+            return resp.json()
+        except Exception as e:
+            return {"error": f"xAI Grok request failed: {str(e)}"}
+
 async def process_request(model: str, messages: List[Dict], temperature: float = 0.7, api_key: str = "") -> Dict:
     start_time = time.time()
     
-    if "gemini" in model.lower():
+    model_lower = model.lower()
+    if "claude" in model_lower:
+        provider = "Anthropic"
+        response = await route_to_claude(model, messages, temperature)
+    elif "gemini" in model_lower:
         provider = "Gemini"
         response = await route_to_gemini(model, messages, temperature)
+    elif "grok" in model_lower:
+        provider = "xAI (Grok)"
+        response = await route_to_grok(model, messages, temperature)
+    elif "llama" in model_lower or "mixtral" in model_lower or "groq" in model_lower:
+        provider = "Groq"
+        response = await route_to_groq(model, messages, temperature)
     else:
         provider = "OpenAI"
         response = await route_to_openai(model, messages, temperature)
